@@ -15,8 +15,7 @@
  ******************************************************************************/
 package org.commonjava.routem.data;
 
-import static org.commonjava.couch.util.IdUtils.namespaceId;
-
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,11 +27,15 @@ import org.commonjava.couch.db.CouchManager;
 import org.commonjava.couch.model.CouchApp;
 import org.commonjava.routem.data.RouteMAppDescription.View;
 import org.commonjava.routem.inject.RouteMData;
-import org.commonjava.routem.model.Route;
+import org.commonjava.routem.model.Group;
+import org.commonjava.routem.model.MirrorOf;
+import org.commonjava.util.logging.Logger;
 
 @Singleton
 public class RouteDataManager
 {
+
+    private final Logger logger = new Logger( getClass() );
 
     @Inject
     private CouchManager couch;
@@ -74,74 +77,179 @@ public class RouteDataManager
         }
     }
 
-    // FIXME: What about child groupIds?? We need to match those here too.
-    public List<Route> getRoutesContainingGroupId( final String groupId )
+    public Group getGroup( final String groupId )
         throws RouteMDataException
     {
         try
         {
-            return couch.getViewListing( new RouteMViewRequest( View.ROUTES_FOR_GROUP, groupId ), Route.class );
-        }
-        catch ( final CouchDBException e )
-        {
-            throw new RouteMDataException( "Failed to retrieve route listing for groupId: %s. Reason: %s", e, groupId,
-                                           e.getMessage() );
-        }
-    }
-
-    public Route getRoute( final String targetUrl )
-        throws RouteMDataException
-    {
-        try
-        {
-            final List<Route> routes =
-                couch.getViewListing( new RouteMViewRequest( View.ALL_ROUTES, namespaceId( Route.NAMESPACE, targetUrl ) ),
-                                      Route.class );
-            if ( routes == null || routes.isEmpty() )
+            final List<Group> results = couch.getDocuments( Group.class, true, GroupRef.generateKeys( groupId ) );
+            if ( results == null || results.isEmpty() )
             {
                 return null;
             }
+            else if ( results.size() == 1 )
+            {
+                return results.get( 0 );
+            }
             else
             {
-                return routes.get( 0 );
+                Collections.sort( results );
+                return results.get( 0 );
             }
         }
         catch ( final CouchDBException e )
         {
-            throw new RouteMDataException( "Failed to retrieve route listing for target URL: %s. Reason: %s", e,
+            throw new RouteMDataException( "Failed to retrieve group: %s. Reason: %s", e, groupId, e.getMessage() );
+        }
+    }
+
+    public List<Group> getGroupsUsingCanonicalUrl( final String canonicalUrl )
+        throws RouteMDataException
+    {
+        try
+        {
+            return couch.getViewListing( new RouteMViewRequest( View.GROUPS_USING_CANONICAL_URL, canonicalUrl ),
+                                         Group.class );
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException(
+                                           "Failed to retrieve listing of group definitions using canonical URL: %s. Reason: %s",
+                                           e, canonicalUrl, e.getMessage() );
+        }
+    }
+
+    public List<MirrorOf> getMirrorsOfGroup( final String groupId )
+        throws RouteMDataException
+    {
+        final Group group = getGroup( groupId );
+        if ( group == null )
+        {
+            logger.warn( "Group: %s not found; cannot retrieve list of mirrors.", groupId );
+            return Collections.emptyList();
+        }
+
+        try
+        {
+            logger.warn( "Retrieving mirrors of group canonical URL: %s.", group.getCanonicalUrl() );
+            return couch.getViewListing( new RouteMViewRequest( View.MIRRORS_OF_CANONICAL_URL, group.getCanonicalUrl() ),
+                                         MirrorOf.class );
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException(
+                                           "Failed to retrieve route mirror for canonical URL: %s of group: %s. Reason: %s",
+                                           e, group.getCanonicalUrl(), groupId, e.getMessage() );
+        }
+    }
+
+    public MirrorOf getMirror( final String canonicalUrl, final String targetUrl )
+        throws RouteMDataException
+    {
+        try
+        {
+            return couch.getDocument( new MirrorOfRef( canonicalUrl, targetUrl ), MirrorOf.class );
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException(
+                                           "Failed to retrieve mirror-of entry for canonical URL: %s, target URL: %s. Reason: %s",
+                                           e, canonicalUrl, targetUrl, e.getMessage() );
+        }
+    }
+
+    public List<MirrorOf> getMirrorsOfCanonicalUrl( final String canonicalUrl )
+        throws RouteMDataException
+    {
+        try
+        {
+            return couch.getViewListing( new RouteMViewRequest( View.MIRRORS_OF_CANONICAL_URL, canonicalUrl ),
+                                         MirrorOf.class );
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException( "Failed to retrieve mirrors of canonical URL: %s. Reason: %s", e,
+                                           canonicalUrl, e.getMessage() );
+        }
+    }
+
+    public List<MirrorOf> getMirrorComposition( final String targetUrl )
+        throws RouteMDataException
+    {
+        try
+        {
+            return couch.getViewListing( new RouteMViewRequest( View.MIRROR_COMPOSITION, targetUrl ), MirrorOf.class );
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException( "Failed to retrieve mirror composition for target URL: %s. Reason: %s", e,
                                            targetUrl, e.getMessage() );
         }
     }
 
-    public List<Route> getAllRoutes()
+    public boolean store( final MirrorOf mirrorOf )
+        throws RouteMDataException
+    {
+        return store( mirrorOf, false );
+    }
+
+    public boolean store( final MirrorOf mirrorOf, final boolean skipIfExists )
         throws RouteMDataException
     {
         try
         {
-            return couch.getViewListing( new RouteMViewRequest( View.ALL_ROUTES ), Route.class );
+            return couch.store( mirrorOf, skipIfExists );
         }
         catch ( final CouchDBException e )
         {
-            throw new RouteMDataException( "Failed to retrieve route listing. Reason: %s", e, e.getMessage() );
+            throw new RouteMDataException( "Failed to store mirror-of mapping: %s. Reason: %s", e, mirrorOf,
+                                           e.getMessage() );
         }
     }
 
-    public boolean storeRoute( final Route route )
+    public boolean store( final Group group )
         throws RouteMDataException
     {
-        return storeRoute( route, false );
+        return store( group, false );
     }
 
-    public boolean storeRoute( final Route route, final boolean skipIfExists )
+    public boolean store( final Group group, final boolean skipIfExists )
         throws RouteMDataException
     {
         try
         {
-            return couch.store( route, skipIfExists );
+            return couch.store( group, skipIfExists );
         }
         catch ( final CouchDBException e )
         {
-            throw new RouteMDataException( "Failed to store route: %s. Reason: %s", e, route.getTargetUrl(),
+            throw new RouteMDataException( "Failed to store group definition: %s. Reason: %s", e, group, e.getMessage() );
+        }
+    }
+
+    public void delete( final MirrorOf mirrorOf )
+        throws RouteMDataException
+    {
+        try
+        {
+            couch.delete( mirrorOf );
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException( "Failed to delete mirror-of mapping: %s. Reason: %s", e, mirrorOf,
+                                           e.getMessage() );
+        }
+    }
+
+    public void delete( final Group group )
+        throws RouteMDataException
+    {
+        try
+        {
+            couch.delete( group );
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException( "Failed to delete group definition: %s. Reason: %s", e, group,
                                            e.getMessage() );
         }
     }
