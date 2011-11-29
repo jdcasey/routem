@@ -119,6 +119,7 @@ public class RouteDataManager
         }
     }
 
+    // TODO: Wildcard support!
     public List<MirrorOf> getMirrorsOfGroup( final String groupId )
         throws RouteMDataException
     {
@@ -158,6 +159,7 @@ public class RouteDataManager
         }
     }
 
+    // TODO: Wildcard support!
     public List<MirrorOf> getMirrorsOfCanonicalUrl( final String canonicalUrl )
         throws RouteMDataException
     {

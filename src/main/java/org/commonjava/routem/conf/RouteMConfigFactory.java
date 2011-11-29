@@ -36,7 +36,7 @@ import org.commonjava.web.config.dotconf.DotConfConfigurationReader;
 public class RouteMConfigFactory
     extends DefaultConfigurationListener
 {
-    private static final String CONFIG_PATH = "/etc/aprox/security.conf";
+    private static final String CONFIG_PATH = System.getProperty( "user.home" ) + "/.m2/routem.conf";
 
     private DefaultCouchDBConfiguration config;
 
