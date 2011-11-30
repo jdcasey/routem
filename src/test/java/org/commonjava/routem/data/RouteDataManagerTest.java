@@ -27,6 +27,7 @@ import org.cjtest.fixture.CouchFixture;
 import org.commonjava.couch.test.fixture.LoggingFixture;
 import org.commonjava.routem.model.Group;
 import org.commonjava.routem.model.MirrorOf;
+import org.commonjava.routem.rest.live.fixture.TestRouteMConfigFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -35,12 +36,10 @@ import org.junit.Test;
 public class RouteDataManagerTest
 {
 
-    private static final String DB_URL = "http://localhost:5984/test-routem";
-
     private RouteDataManager dataManager;
 
     @Rule
-    public CouchFixture fixture = new CouchFixture( DB_URL );
+    public CouchFixture fixture = new CouchFixture( TestRouteMConfigFactory.DB_URL );
 
     @BeforeClass
     public static void logging()

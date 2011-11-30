@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Copyright 2011 John Casey
   
@@ -13,10 +14,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.commonjava.couch.web</groupId>
     <artifactId>couch-web</artifactId>
@@ -26,14 +25,14 @@
   <groupId>org.commonjava.routem</groupId>
   <artifactId>routem</artifactId>
   <version>0.1-SNAPSHOT</version>
+  
   <packaging>war</packaging>
-
-  <name>routem</name>
-
+  <name>Route-M Maven Repository Redirector</name>
+  
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-
+  
   <dependencies>
     <dependency>
       <groupId>org.commonjava.couch</groupId>
@@ -51,5 +50,95 @@
       <groupId>org.commonjava.couch.test</groupId>
       <artifactId>couch-test-harness</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.commonjava.couch.test</groupId>
+      <artifactId>couch-as7-test-harness</artifactId>
+    </dependency>
   </dependencies>
+  
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.10</version>
+          <configuration>
+            <excludes>
+              <exclude>**/fixture/*.java</exclude>
+              <exclude>**/live/*.java</exclude>
+              <exclude>**/live/**/*.java</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.10</version>
+          <configuration>
+            <excludes>
+              <exclude>**/fixture/*.java</exclude>
+            </excludes>
+            <includes>
+              <include>**/live/*.java</include>
+              <include>**/live/**/*.java</include>
+            </includes>
+          </configuration>
+          <executions>
+            <execution>
+              <id>integration-tests</id>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[1.0.0,)</versionRange>
+                    <goals>
+                      <goal>copy-dependencies</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore/>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.3</version>
+          <executions>
+            <execution>
+              <id>resolve-for-testing</id>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+              <phase>process-test-classes</phase>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    
+    <plugins>
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

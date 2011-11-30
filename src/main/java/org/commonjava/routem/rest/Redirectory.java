@@ -25,7 +25,6 @@ import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -39,7 +38,6 @@ import org.commonjava.routem.model.MirrorOf;
 import org.commonjava.util.logging.Logger;
 
 @Path( "/redirectory" )
-@Singleton
 @RequestScoped
 public class Redirectory
 {
@@ -66,11 +64,14 @@ public class Redirectory
                 // TODO: Wildcard support!
                 builder = Response.status( Status.NOT_FOUND );
             }
+            else
+            {
+                // TODO: Select a mirror properly!
+                final MirrorOf selected = mirrors.get( 0 );
 
-            // TODO: Select a mirror properly!
-            final MirrorOf selected = mirrors.get( 0 );
-
-            builder.contentLocation( new URI( buildUrl( selected.getTargetUrl(), path ) ) );
+                builder = Response.status( Status.TEMPORARY_REDIRECT )
+                                  .location( new URI( buildUrl( selected.getTargetUrl(), path ) ) );
+            }
         }
         catch ( final RouteMDataException e )
         {
@@ -111,7 +112,19 @@ public class Redirectory
             f = d;
         }
 
-        return f.getPath();
+        String gid = f.getPath()
+                      .replace( '/', '.' );
+        if ( gid.length() < 1 || gid.equals( "." ) )
+        {
+            return null;
+        }
+
+        if ( gid.startsWith( "." ) )
+        {
+            gid = gid.substring( 1 );
+        }
+
+        return gid;
     }
 
 }
