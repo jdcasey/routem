@@ -28,7 +28,7 @@ import javax.enterprise.inject.Produces;
 
 import org.commonjava.couch.conf.CouchDBConfiguration;
 import org.commonjava.couch.conf.DefaultCouchDBConfiguration;
-import org.commonjava.routem.inject.Production;
+import org.commonjava.couch.inject.Production;
 import org.commonjava.routem.inject.RouteMData;
 import org.commonjava.web.config.ConfigurationException;
 import org.commonjava.web.config.DefaultConfigurationListener;
