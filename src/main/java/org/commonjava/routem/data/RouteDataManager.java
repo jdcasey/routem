@@ -21,6 +21,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.commonjava.auth.couch.conf.UserManagerConfiguration;
+import org.commonjava.auth.couch.data.UserDataException;
+import org.commonjava.auth.couch.data.UserDataManager;
 import org.commonjava.couch.conf.CouchDBConfiguration;
 import org.commonjava.couch.db.CouchDBException;
 import org.commonjava.couch.db.CouchManager;
@@ -38,20 +41,30 @@ public class RouteDataManager
     private final Logger logger = new Logger( getClass() );
 
     @Inject
+    @RouteMData
     private CouchManager couch;
 
     @Inject
     @RouteMData
     private CouchDBConfiguration couchConfig;
 
+    @Inject
+    private UserDataManager userDataManager;
+
+    @Inject
+    private UserManagerConfiguration userConfig;
+
     RouteDataManager()
     {
     }
 
-    public RouteDataManager( final CouchManager couch, final CouchDBConfiguration config )
+    public RouteDataManager( final CouchManager couch, final CouchDBConfiguration config,
+                             final UserDataManager userDataManager, final UserManagerConfiguration userConfig )
     {
         this.couch = couch;
         this.couchConfig = config;
+        this.userDataManager = userDataManager;
+        this.userConfig = userConfig;
     }
 
     public void install()
@@ -74,6 +87,18 @@ public class RouteDataManager
         {
             throw new RouteMDataException( "Failed to initialize routing database: %s (application: %s). Reason: %s",
                                            e, couchConfig.getDatabaseUrl(), description.getAppName(), e.getMessage() );
+        }
+
+        try
+        {
+            userDataManager.install();
+            userDataManager.setupAdminInformation();
+        }
+        catch ( final UserDataException e )
+        {
+            throw new RouteMDataException( "Failed to initialize routing-admin user database: %s. Reason: %s", e,
+                                           userConfig.getDatabaseConfig()
+                                                     .getDatabaseUrl(), e.getMessage() );
         }
     }
 
@@ -252,6 +277,34 @@ public class RouteDataManager
         catch ( final CouchDBException e )
         {
             throw new RouteMDataException( "Failed to delete group definition: %s. Reason: %s", e, group,
+                                           e.getMessage() );
+        }
+    }
+
+    public List<Group> getAllGroupDefinitions()
+        throws RouteMDataException
+    {
+        try
+        {
+            return couch.getViewListing( new RouteMViewRequest( View.ALL_GROUPS ), Group.class );
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException( "Failed to retrieve full listing of group definitions. Reason: %s", e,
+                                           e.getMessage() );
+        }
+    }
+
+    public List<MirrorOf> getAllMirrorOfDefinitions()
+        throws RouteMDataException
+    {
+        try
+        {
+            return couch.getViewListing( new RouteMViewRequest( View.ALL_MIRROR_OFS ), MirrorOf.class );
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException( "Failed to retrieve full listing of mirror-of definitions. Reason: %s", e,
                                            e.getMessage() );
         }
     }

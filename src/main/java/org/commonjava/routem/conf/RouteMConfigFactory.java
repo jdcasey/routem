@@ -26,6 +26,8 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Produces;
 
+import org.commonjava.auth.couch.conf.DefaultUserManagerConfig;
+import org.commonjava.auth.couch.conf.UserManagerConfiguration;
 import org.commonjava.couch.conf.CouchDBConfiguration;
 import org.commonjava.couch.conf.DefaultCouchDBConfiguration;
 import org.commonjava.couch.inject.Production;
@@ -41,10 +43,12 @@ public class RouteMConfigFactory
 
     private DefaultCouchDBConfiguration config;
 
+    private DefaultUserManagerConfig userConfig;
+
     public RouteMConfigFactory()
         throws ConfigurationException
     {
-        super( DefaultCouchDBConfiguration.class );
+        super( DefaultCouchDBConfiguration.class, DefaultUserManagerConfig.class );
     }
 
     @PostConstruct
@@ -78,10 +82,30 @@ public class RouteMConfigFactory
 
     @Produces
     @Production
+    @Default
+    public synchronized UserManagerConfiguration getUserConfiguration()
+    {
+        if ( userConfig == null )
+        {
+            userConfig =
+                new DefaultUserManagerConfig( "admin@changeme.com", "admin123", "Admin", "User", getConfiguration(),
+                                              "routem-users" );
+        }
+
+        return userConfig;
+    }
+
+    @Produces
+    @Production
     @RouteMData
     @Default
-    public CouchDBConfiguration getConfiguration()
+    public synchronized CouchDBConfiguration getConfiguration()
     {
+        if ( config == null )
+        {
+            config = new DefaultCouchDBConfiguration( "http://localhost:5984/routem" );
+        }
+
         return config;
     }
 
@@ -90,6 +114,7 @@ public class RouteMConfigFactory
         throws ConfigurationException
     {
         config = getConfiguration( DefaultCouchDBConfiguration.class );
+        userConfig = getConfiguration( DefaultUserManagerConfig.class );
     }
 
 }

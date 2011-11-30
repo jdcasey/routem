@@ -23,8 +23,8 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 
 import org.apache.log4j.Level;
-import org.cjtest.fixture.CouchFixture;
 import org.commonjava.couch.test.fixture.LoggingFixture;
+import org.commonjava.couch.user.fixture.CouchUserFixture;
 import org.commonjava.routem.model.Group;
 import org.commonjava.routem.model.MirrorOf;
 import org.commonjava.routem.rest.live.fixture.TestRouteMConfigFactory;
@@ -39,7 +39,7 @@ public class RouteDataManagerTest
     private RouteDataManager dataManager;
 
     @Rule
-    public CouchFixture fixture = new CouchFixture( TestRouteMConfigFactory.DB_URL );
+    public CouchUserFixture fixture = new CouchUserFixture( TestRouteMConfigFactory.DB_URL );
 
     @BeforeClass
     public static void logging()
@@ -51,7 +51,10 @@ public class RouteDataManagerTest
     public void setup()
         throws Exception
     {
-        dataManager = new RouteDataManager( fixture.getCouchManager(), fixture.getCouchConfig() );
+        dataManager =
+            new RouteDataManager( fixture.getCouchManager(), fixture.getCouchConfig(), fixture.getUserDataManager(),
+                                  fixture.getUserManagerConfiguration() );
+
         dataManager.install();
     }
 

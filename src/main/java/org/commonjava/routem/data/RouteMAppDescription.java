@@ -30,7 +30,9 @@ public class RouteMAppDescription
     {
         MIRRORS_OF_CANONICAL_URL( "mirrors-of-canonical-url" ),
         MIRROR_COMPOSITION( "mirror-composition" ),
-        GROUPS_USING_CANONICAL_URL( "groups-using-canonical-url" );
+        GROUPS_USING_CANONICAL_URL( "groups-using-canonical-url" ),
+        ALL_GROUPS( "all-groups" ),
+        ALL_MIRROR_OFS( "all-mirror-ofs" );
 
         String name;
 

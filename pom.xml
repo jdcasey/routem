@@ -52,7 +52,19 @@
     </dependency>
     <dependency>
       <groupId>org.commonjava.couch.test</groupId>
-      <artifactId>couch-as7-test-harness</artifactId>
+      <artifactId>couch-user-test-harness</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonjava.couch</groupId>
+      <artifactId>shiro-couch</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonjava.couch</groupId>
+      <artifactId>couch-user-manager</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonjava.couch.web</groupId>
+      <artifactId>restful-user-manager</artifactId>
     </dependency>
   </dependencies>
   
