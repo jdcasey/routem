@@ -79,6 +79,29 @@ public abstract class RouteDataManagerTCK
     }
 
     @Test
+    public void addThenDeleteOneGroup_ByGroupId()
+        throws Exception
+    {
+        final String url = "http://www.somewhere.com/path/to/repo";
+        final String id = "org.apache.maven";
+
+        final Group g = new Group( id, url );
+
+        assertThat( getDataManager().store( g ), equalTo( true ) );
+
+        Group result = getDataManager().getGroup( id );
+
+        assertThat( result, notNullValue() );
+        assertThat( result, equalTo( g ) );
+
+        getDataManager().deleteGroup( g.getGroupId() );
+
+        result = getDataManager().getGroup( id );
+
+        assertThat( result, nullValue() );
+    }
+
+    @Test
     public void addOneMirrorOfThenRetrieveItByUrls()
         throws Exception
     {
@@ -116,6 +139,31 @@ public abstract class RouteDataManagerTCK
         assertThat( result, equalTo( m ) );
 
         getDataManager().delete( m );
+
+        result = getDataManager().getMirror( curl, target );
+
+        assertThat( result, nullValue() );
+    }
+
+    @Test
+    public void addThenDeleteOneMirrorOf_ByUrls()
+        throws Exception
+    {
+        final String curl = "http://repo1.maven.apache.org/maven2/";
+        final String target = "http://repository.commonjava.org/";
+
+        final MirrorOf m = new MirrorOf( curl, target );
+
+        assertThat( getDataManager().store( m ), equalTo( true ) );
+
+        MirrorOf result = getDataManager().getMirror( curl, target );
+
+        assertThat( result, notNullValue() );
+        assertThat( result.getCanonicalUrl(), equalTo( curl ) );
+        assertThat( result.getTargetUrl(), equalTo( target ) );
+        assertThat( result, equalTo( m ) );
+
+        getDataManager().deleteMirror( m.getCanonicalUrl(), m.getTargetUrl() );
 
         result = getDataManager().getMirror( curl, target );
 

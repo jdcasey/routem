@@ -17,6 +17,8 @@ package org.commonjava.routem.model;
 
 import java.io.Serializable;
 
+import com.google.gson.annotations.SerializedName;
+
 public final class Group
     extends ModelMetadata
     implements Serializable, Comparable<Group>
@@ -26,8 +28,10 @@ public final class Group
 
     private static final long serialVersionUID = 1L;
 
+    @SerializedName( "group_id" )
     private String groupId;
 
+    @SerializedName( "canonical_url" )
     private String canonicalUrl;
 
     public Group( final String groupId, final String canonicalUrl )

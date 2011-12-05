@@ -17,14 +17,12 @@ public interface RouteDataManager
     List<Group> getGroupsUsingCanonicalUrl( final String canonicalUrl )
         throws RouteMDataException;
 
-    // TODO: Wildcard support!
     List<MirrorOf> getMirrorsOfGroup( final String groupId )
         throws RouteMDataException;
 
     MirrorOf getMirror( final String canonicalUrl, final String targetUrl )
         throws RouteMDataException;
 
-    // TODO: Wildcard support!
     List<MirrorOf> getMirrorsOfCanonicalUrl( final String canonicalUrl )
         throws RouteMDataException;
 
@@ -53,6 +51,12 @@ public interface RouteDataManager
         throws RouteMDataException;
 
     List<MirrorOf> getAllMirrorOfDefinitions()
+        throws RouteMDataException;
+
+    void deleteGroup( String groupId )
+        throws RouteMDataException;
+
+    void deleteMirror( String canonicalUrl, String targetUrl )
         throws RouteMDataException;
 
 }

@@ -29,6 +29,7 @@
     <module>admin</module>
     <module>api</module>
     <module>test</module>
+    <module>web</module>
   </modules>
   
   <dependencyManagement>
@@ -49,12 +50,12 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>routem-core</artifactId>
+        <artifactId>routem-web-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>routem-admin</artifactId>
+        <artifactId>routem-web-admin</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

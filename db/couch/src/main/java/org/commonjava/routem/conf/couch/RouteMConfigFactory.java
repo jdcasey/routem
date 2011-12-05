@@ -16,7 +16,6 @@
 package org.commonjava.routem.conf.couch;
 
 import static org.apache.commons.io.IOUtils.closeQuietly;
-import static org.commonjava.routem.conf.RouteMConfigConstants.CONFIG_PATH;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +39,10 @@ import org.commonjava.web.config.dotconf.DotConfConfigurationReader;
 public class RouteMConfigFactory
     extends DefaultConfigurationListener
 {
+    public static final String DEFAULT_CONFIG_PATH = "/etc/routem/main.conf";
+
+    public static final String CONFIG_PATH_SYSPROP = "routem.couch.config";
+
     private DefaultCouchDBConfiguration config;
 
     private DefaultUserManagerConfig userConfig;
@@ -54,18 +57,20 @@ public class RouteMConfigFactory
     protected void load()
         throws ConfigurationException
     {
-        final File configFile = new File( CONFIG_PATH );
+        final String configPath = System.getProperty( CONFIG_PATH_SYSPROP, DEFAULT_CONFIG_PATH );
+
+        final File configFile = new File( configPath );
         if ( configFile.isFile() )
         {
             InputStream stream = null;
             try
             {
-                stream = new FileInputStream( CONFIG_PATH );
+                stream = new FileInputStream( configFile );
                 new DotConfConfigurationReader( this ).loadConfiguration( stream );
             }
             catch ( final IOException e )
             {
-                throw new ConfigurationException( "Cannot open configuration file: %s. Reason: %s", e, CONFIG_PATH,
+                throw new ConfigurationException( "Cannot open configuration file: %s. Reason: %s", e, configPath,
                                                   e.getMessage() );
             }
             finally
@@ -75,7 +80,7 @@ public class RouteMConfigFactory
         }
         else
         {
-            throw new ConfigurationException( "Cannot load configuration. File %s is missing.", CONFIG_PATH );
+            throw new ConfigurationException( "Cannot load configuration. File %s is missing.", configPath );
         }
     }
 

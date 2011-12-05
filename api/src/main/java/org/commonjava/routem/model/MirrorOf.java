@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.annotations.SerializedName;
+
 public final class MirrorOf
     extends ModelMetadata
     implements Serializable
@@ -29,10 +31,13 @@ public final class MirrorOf
 
     private static final long serialVersionUID = 1L;
 
+    @SerializedName( "target_url" )
     private String targetUrl;
 
+    @SerializedName( "canonical_url" )
     private String canonicalUrl;
 
+    @SerializedName( "X_selection_hints" )
     private Map<String, String> selectionHints;
 
     public MirrorOf( final String canonicalUrl, final String targetUrl )

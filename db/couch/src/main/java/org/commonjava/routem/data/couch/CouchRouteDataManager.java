@@ -409,4 +409,34 @@ public class CouchRouteDataManager
         }
     }
 
+    @Override
+    public void deleteGroup( final String groupId )
+        throws RouteMDataException
+    {
+        try
+        {
+            couch.delete( new GroupRef( groupId ) );
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException( "Failed to delete group. Group ID: %s\nReason: %s", e, groupId,
+                                           e.getMessage() );
+        }
+    }
+
+    @Override
+    public void deleteMirror( final String canonicalUrl, final String targetUrl )
+        throws RouteMDataException
+    {
+        try
+        {
+            couch.delete( new MirrorOfRef( canonicalUrl, targetUrl ) );
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException( "Failed to delete mirror. Canonical URL: %s\nTarget URL: %s\nReason: %s", e,
+                                           canonicalUrl, targetUrl, e.getMessage() );
+        }
+    }
+
 }
