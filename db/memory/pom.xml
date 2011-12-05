@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>routem-db</artifactId>
+    <groupId>org.commonjava.routem</groupId>
+    <version>0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>routem-db-memory</artifactId>
+
+  <name>Route-M :: In-Memory Database</name>
+  
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>routem-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>routem-test-db</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonjava.util</groupId>
+      <artifactId>logging</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonjava.couch.test</groupId>
+      <artifactId>couch-test-harness</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+    </dependency>
+  </dependencies>
+  
+</project>
