@@ -24,9 +24,7 @@
   <name>Route-M :: Parent</name>
   
   <modules>
-    <module>core</module>
     <module>db</module>
-    <module>admin</module>
     <module>api</module>
     <module>test</module>
     <module>web</module>

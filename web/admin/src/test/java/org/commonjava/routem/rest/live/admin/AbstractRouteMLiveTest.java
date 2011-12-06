@@ -326,10 +326,14 @@ public abstract class AbstractRouteMLiveTest
         }
     }
 
-    protected String resourceUrl( final String path )
+    protected String resourceUrl( final String... path )
         throws MalformedURLException
     {
-        return buildUrl( "http://localhost:8080/test/api/", apiVersion(), path );
+        final String[] parts = new String[path.length + 1];
+        parts[0] = apiVersion();
+        System.arraycopy( path, 0, parts, 1, path.length );
+
+        return buildUrl( "http://localhost:8080/test/api/", parts );
     }
 
     protected String apiVersion()

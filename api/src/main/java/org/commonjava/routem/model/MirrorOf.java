@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import com.google.gson.annotations.SerializedName;
 
 public final class MirrorOf
@@ -40,10 +42,19 @@ public final class MirrorOf
     @SerializedName( "X_selection_hints" )
     private Map<String, String> selectionHints;
 
+    @SerializedName( "mirror_id" )
+    private String mirrorId;
+
     public MirrorOf( final String canonicalUrl, final String targetUrl )
     {
         this.canonicalUrl = canonicalUrl;
         this.targetUrl = targetUrl;
+        this.mirrorId = mirrorId( canonicalUrl, targetUrl );
+    }
+
+    public static String mirrorId( final String canonicalUrl, final String targetUrl )
+    {
+        return DigestUtils.md5Hex( canonicalUrl + targetUrl );
     }
 
     protected MirrorOf()
@@ -55,6 +66,7 @@ public final class MirrorOf
         this.canonicalUrl = canonicalUrl;
         this.targetUrl = targetUrl;
         this.selectionHints = selectionHints;
+        this.mirrorId = mirrorId( canonicalUrl, targetUrl );
     }
 
     public Map<String, String> getSelectionHints()
@@ -103,19 +115,22 @@ public final class MirrorOf
         this.canonicalUrl = canonicalUrl;
     }
 
-    @Override
-    public String toString()
+    public String getMirrorId()
     {
-        return String.format( "MirrorOf [canonicalUrl=%s, targetUrl=%s]", canonicalUrl, targetUrl );
+        return mirrorId;
+    }
+
+    protected void setMirrorId( final String mirrorId )
+    {
+        this.mirrorId = mirrorId;
     }
 
     @Override
     public int hashCode()
     {
         final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ( ( canonicalUrl == null ) ? 0 : canonicalUrl.hashCode() );
-        result = prime * result + ( ( targetUrl == null ) ? 0 : targetUrl.hashCode() );
+        int result = 1;
+        result = prime * result + ( ( mirrorId == null ) ? 0 : mirrorId.hashCode() );
         return result;
     }
 
@@ -126,34 +141,34 @@ public final class MirrorOf
         {
             return true;
         }
+        if ( obj == null )
+        {
+            return false;
+        }
         if ( getClass() != obj.getClass() )
         {
             return false;
         }
         final MirrorOf other = (MirrorOf) obj;
-        if ( canonicalUrl == null )
+        if ( mirrorId == null )
         {
-            if ( other.canonicalUrl != null )
+            if ( other.mirrorId != null )
             {
                 return false;
             }
         }
-        else if ( !canonicalUrl.equals( other.canonicalUrl ) )
-        {
-            return false;
-        }
-        if ( targetUrl == null )
-        {
-            if ( other.targetUrl != null )
-            {
-                return false;
-            }
-        }
-        else if ( !targetUrl.equals( other.targetUrl ) )
+        else if ( !mirrorId.equals( other.mirrorId ) )
         {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format( "MirrorOf [targetUrl=%s, canonicalUrl=%s, selectionHints=%s, mirrorId=%s]", targetUrl,
+                              canonicalUrl, selectionHints, mirrorId );
     }
 
 }

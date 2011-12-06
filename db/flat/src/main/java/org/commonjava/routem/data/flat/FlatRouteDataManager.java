@@ -203,4 +203,12 @@ public class FlatRouteDataManager
         sync();
     }
 
+    @Override
+    public void deleteMirror( final String mirrorId )
+        throws RouteMDataException
+    {
+        super.deleteMirror( mirrorId );
+        sync();
+    }
+
 }

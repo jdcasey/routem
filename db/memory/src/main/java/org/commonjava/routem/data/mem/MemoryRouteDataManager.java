@@ -257,4 +257,34 @@ public class MemoryRouteDataManager
         }
     }
 
+    @Override
+    public MirrorOf getMirror( final String mirrorId )
+        throws RouteMDataException
+    {
+        for ( final MirrorOf mirror : mirrors )
+        {
+            if ( mirror.getMirrorId()
+                       .equals( mirrorId ) )
+            {
+                return mirror;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public void deleteMirror( final String mirrorId )
+        throws RouteMDataException
+    {
+        for ( final MirrorOf mirror : new HashSet<MirrorOf>( mirrors ) )
+        {
+            if ( mirror.getMirrorId()
+                       .equals( mirrorId ) )
+            {
+                mirrors.remove( mirror );
+            }
+        }
+    }
+
 }

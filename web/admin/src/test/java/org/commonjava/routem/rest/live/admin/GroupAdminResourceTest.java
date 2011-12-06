@@ -26,6 +26,28 @@ public class GroupAdminResourceTest
     }
 
     @Test
+    public void addOneGroupAndGetByGroupId()
+        throws Exception
+    {
+        final Group g1 = new Group( "org.apache.maven", "http://repo1.maven.apache.org/maven2/" );
+
+        assertThat( dataManager.store( g1 ), equalTo( true ) );
+
+        final HttpResponse response =
+            getWithResponse( resourceUrl( "/admin/group/", g1.getGroupId() ), 200, "application/json" );
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        copy( response.getEntity()
+                      .getContent(), baos );
+
+        final String result = new String( baos.toByteArray() );
+
+        assertThat( result.contains( g1.getGroupId() ), equalTo( true ) );
+        assertThat( result.contains( g1.getCanonicalUrl() ), equalTo( true ) );
+
+        System.out.println( "Group listing:\n\n\n\n" + result + "\n\n\n\n" );
+    }
+
+    @Test
     public void addTwoGroupsAndGetPlainTextListingContainingBoth()
         throws Exception
     {

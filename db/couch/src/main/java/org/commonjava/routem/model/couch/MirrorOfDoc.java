@@ -16,6 +16,7 @@
 package org.commonjava.routem.model.couch;
 
 import static org.commonjava.couch.util.IdUtils.namespaceId;
+import static org.commonjava.routem.model.MirrorOf.NAMESPACE;
 import static org.commonjava.routem.model.couch.MetadataKeys.ID_METADATA;
 import static org.commonjava.routem.model.couch.MetadataKeys.REV_METADATA;
 
@@ -38,8 +39,6 @@ public final class MirrorOfDoc
     implements DenormalizedCouchDoc, Serializable
 {
 
-    public static final String NAMESPACE = "mirror_of";
-
     private static final long serialVersionUID = 1L;
 
     @SerializedName( "target_url" )
@@ -51,11 +50,15 @@ public final class MirrorOfDoc
     @SerializedName( "X_selection_hints" )
     private Map<String, String> selectionHints;
 
+    @SerializedName( "mirror_id" )
+    private String mirrorId;
+
     public MirrorOfDoc( final MirrorOf mirror )
     {
         this.canonicalUrl = mirror.getCanonicalUrl();
         this.targetUrl = mirror.getTargetUrl();
         this.selectionHints = mirror.getSelectionHints();
+        this.mirrorId = mirror.getMirrorId();
         setCouchDocRev( mirror.getMetadata( REV_METADATA, String.class ) );
     }
 
@@ -78,12 +81,7 @@ public final class MirrorOfDoc
     @Override
     public void calculateDenormalizedFields()
     {
-        setCouchDocId( id( canonicalUrl, targetUrl ) );
-    }
-
-    public static String id( final String canonicalUrl, final String targetUrl )
-    {
-        return namespaceId( NAMESPACE, canonicalUrl.replace( '/', '_' ), targetUrl.replace( '/', '_' ) );
+        setCouchDocId( namespaceId( NAMESPACE, mirrorId ) );
     }
 
     public Map<String, String> getSelectionHints()
@@ -137,10 +135,25 @@ public final class MirrorOfDoc
         this.canonicalUrl = canonicalUrl;
     }
 
-    @Override
-    public String toString()
+    public String getMirrorId()
     {
-        return String.format( "MirrorOf [canonicalUrl=%s, targetUrl=%s]", canonicalUrl, targetUrl );
+        return mirrorId;
+    }
+
+    protected void setMirrorId( final String mirrorId )
+    {
+        this.mirrorId = mirrorId;
+    }
+
+    public static List<MirrorOf> toMirrorOfs( final List<MirrorOfDoc> docs )
+    {
+        final List<MirrorOf> result = new ArrayList<MirrorOf>();
+        for ( final MirrorOfDoc doc : docs )
+        {
+            result.add( doc.toMirrorOf() );
+        }
+
+        return result;
     }
 
     @Override
@@ -148,8 +161,7 @@ public final class MirrorOfDoc
     {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ( ( canonicalUrl == null ) ? 0 : canonicalUrl.hashCode() );
-        result = prime * result + ( ( targetUrl == null ) ? 0 : targetUrl.hashCode() );
+        result = prime * result + ( ( mirrorId == null ) ? 0 : mirrorId.hashCode() );
         return result;
     }
 
@@ -169,40 +181,25 @@ public final class MirrorOfDoc
             return false;
         }
         final MirrorOfDoc other = (MirrorOfDoc) obj;
-        if ( canonicalUrl == null )
+        if ( mirrorId == null )
         {
-            if ( other.canonicalUrl != null )
+            if ( other.mirrorId != null )
             {
                 return false;
             }
         }
-        else if ( !canonicalUrl.equals( other.canonicalUrl ) )
-        {
-            return false;
-        }
-        if ( targetUrl == null )
-        {
-            if ( other.targetUrl != null )
-            {
-                return false;
-            }
-        }
-        else if ( !targetUrl.equals( other.targetUrl ) )
+        else if ( !mirrorId.equals( other.mirrorId ) )
         {
             return false;
         }
         return true;
     }
 
-    public static List<MirrorOf> toMirrorOfs( final List<MirrorOfDoc> docs )
+    @Override
+    public String toString()
     {
-        final List<MirrorOf> result = new ArrayList<MirrorOf>();
-        for ( final MirrorOfDoc doc : docs )
-        {
-            result.add( doc.toMirrorOf() );
-        }
-
-        return result;
+        return String.format( "MirrorOfDoc [targetUrl=%s, canonicalUrl=%s, selectionHints=%s, mirrorId=%s]", targetUrl,
+                              canonicalUrl, selectionHints, mirrorId );
     }
 
 }

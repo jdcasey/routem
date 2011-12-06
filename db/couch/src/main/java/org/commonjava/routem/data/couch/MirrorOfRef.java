@@ -15,9 +15,10 @@
  ******************************************************************************/
 package org.commonjava.routem.data.couch;
 
-import static org.commonjava.routem.model.couch.MirrorOfDoc.id;
+import static org.commonjava.couch.util.IdUtils.namespaceId;
 
 import org.commonjava.couch.model.CouchDocRef;
+import org.commonjava.routem.model.MirrorOf;
 
 public class MirrorOfRef
     extends CouchDocRef
@@ -25,7 +26,12 @@ public class MirrorOfRef
 
     public MirrorOfRef( final String canonicalUrl, final String targetUrl )
     {
-        super( id( canonicalUrl, targetUrl ) );
+        super( namespaceId( MirrorOf.NAMESPACE, MirrorOf.mirrorId( canonicalUrl, targetUrl ) ) );
+    }
+
+    public MirrorOfRef( final String mirrorId )
+    {
+        super( namespaceId( MirrorOf.NAMESPACE, mirrorId ) );
     }
 
 }

@@ -1,5 +1,6 @@
 package org.commonjava.routem.rest.admin;
 
+import java.net.URI;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -62,29 +63,35 @@ public class MirrorAdminResource
         final String targetUrl = request.getParameter( TARGET_URL_QUERY_PARAM );
         if ( canonicalUrl == null || targetUrl == null )
         {
-            builder =
-                Response.status( Status.BAD_REQUEST )
-                        .entity( "You must provide a value for both the Canonical-URL request parameter: '"
-                                     + CANONICAL_URL_QUERY_PARAM + "' AND the Target-URL request parameter: '"
-                                     + TARGET_URL_QUERY_PARAM + "'." );
+            return Response.status( Status.BAD_REQUEST )
+                           .entity( "You must provide a value for both the Canonical-URL request parameter: '"
+                                        + CANONICAL_URL_QUERY_PARAM + "' AND the Target-URL request parameter: '"
+                                        + TARGET_URL_QUERY_PARAM + "'." )
+                           .build();
         }
 
         final MirrorOf mirror = new MirrorOf( canonicalUrl, targetUrl );
         try
         {
+            final URI location = uriInfo.getAbsolutePathBuilder()
+                                        .path( mirror.getMirrorId() )
+                                        .build();
+
             if ( dataManager.store( mirror, false ) )
             {
-                // TODO
+                builder = Response.ok();
             }
             else
             {
-                // TODO
+                builder = Response.notModified();
             }
+
+            builder.location( location );
         }
         catch ( final RouteMDataException e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error( e.getMessage(), e );
+            builder = Response.serverError();
         }
 
         return builder == null ? Response.serverError()
@@ -99,39 +106,141 @@ public class MirrorAdminResource
         SecurityUtils.getSubject()
                      .isPermitted( Permission.name( MirrorOf.NAMESPACE, Permission.WILDCARD, Permission.ADMIN ) );
 
-        // TODO
-        return Response.ok()
-                       .build();
+        ResponseBuilder builder = null;
+
+        @SuppressWarnings( "unchecked" )
+        final MirrorOf mirror = serializer.fromRequestBody( request, MirrorOf.class );
+
+        try
+        {
+            final URI location = uriInfo.getAbsolutePathBuilder()
+                                        .path( mirror.getMirrorId() )
+                                        .build();
+
+            if ( dataManager.store( mirror, false ) )
+            {
+                builder = Response.ok();
+            }
+            else
+            {
+                builder = Response.notModified();
+            }
+
+            builder.location( location );
+        }
+        catch ( final RouteMDataException e )
+        {
+            logger.error( e.getMessage(), e );
+            builder = Response.serverError();
+        }
+
+        return builder == null ? Response.serverError()
+                                         .build() : builder.build();
     }
 
     @GET
-    @Path( "/{name}" )
-    public Response get( @PathParam( "name" ) final String name )
+    public Response getFromQuery( @Context final HttpServletRequest request, @Context final UriInfo uriInfo )
     {
-        return Response.ok()
-                       .build();
+        ResponseBuilder builder = null;
+
+        final String canonicalUrl = request.getParameter( CANONICAL_URL_QUERY_PARAM );
+        final String targetUrl = request.getParameter( TARGET_URL_QUERY_PARAM );
+        if ( canonicalUrl == null || targetUrl == null )
+        {
+            return Response.status( Status.BAD_REQUEST )
+                           .entity( "You must provide a value for both the Canonical-URL request parameter: '"
+                                        + CANONICAL_URL_QUERY_PARAM + "' AND the Target-URL request parameter: '"
+                                        + TARGET_URL_QUERY_PARAM + "'." )
+                           .build();
+        }
+
+        try
+        {
+            final MirrorOf mirror = dataManager.getMirror( canonicalUrl, targetUrl );
+            if ( mirror == null )
+            {
+                builder = Response.status( Status.NOT_FOUND );
+            }
+            else
+            {
+                final URI location = uriInfo.getAbsolutePathBuilder()
+                                            .path( mirror.getMirrorId() )
+                                            .build();
+
+                final String json = serializer.toString( mirror );
+                builder = Response.ok( json )
+                                  .location( location );
+            }
+        }
+        catch ( final RouteMDataException e )
+        {
+            logger.error( e.getMessage(), e );
+            builder = Response.serverError();
+        }
+
+        return builder == null ? Response.serverError()
+                                         .build() : builder.build();
+    }
+
+    @GET
+    @Path( "/{mirrorId}" )
+    public Response get( @PathParam( "mirrorId" ) final String mirrorId, @Context final UriInfo uriInfo )
+    {
+        ResponseBuilder builder = null;
+
+        try
+        {
+            final MirrorOf mirror = dataManager.getMirror( mirrorId );
+            if ( mirror == null )
+            {
+                builder = Response.status( Status.NOT_FOUND );
+            }
+            else
+            {
+                final String json = serializer.toString( mirror );
+                builder = Response.ok( json );
+            }
+        }
+        catch ( final RouteMDataException e )
+        {
+            logger.error( e.getMessage(), e );
+            builder = Response.serverError();
+        }
+
+        return builder == null ? Response.serverError()
+                                         .build() : builder.build();
     }
 
     @DELETE
-    @Path( "/{name}" )
-    public Response delete( @PathParam( "name" ) final String name )
+    @Path( "/{mirrorId}" )
+    @RequiresAuthentication
+    public Response delete( @PathParam( "mirrorId" ) final String mirrorId )
     {
         SecurityUtils.getSubject()
                      .isPermitted( Permission.name( MirrorOf.NAMESPACE, Permission.WILDCARD, Permission.ADMIN ) );
 
-        // TODO
-        return Response.ok()
-                       .build();
+        ResponseBuilder builder = null;
+
+        try
+        {
+            dataManager.deleteMirror( mirrorId );
+            builder = Response.ok();
+        }
+        catch ( final RouteMDataException e )
+        {
+            logger.error( e.getMessage(), e );
+            builder = Response.serverError();
+        }
+
+        return builder == null ? Response.serverError()
+                                         .build() : builder.build();
     }
 
     @Path( "/list" )
     @Produces( "application/json" )
     @GET
-    public Response listGroupsToJson()
+    public Response listToJson()
     {
-        SecurityUtils.getSubject()
-                     .isPermitted( Permission.name( MirrorOf.NAMESPACE, Permission.WILDCARD, Permission.READ ) );
-
         ResponseBuilder builder = null;
 
         try
@@ -156,11 +265,8 @@ public class MirrorAdminResource
     @Path( "/list" )
     @Produces( "text/plain" )
     @GET
-    public Response listGroupsToTxt()
+    public Response listToTxt()
     {
-        SecurityUtils.getSubject()
-                     .isPermitted( Permission.name( MirrorOf.NAMESPACE, Permission.WILDCARD, Permission.READ ) );
-
         ResponseBuilder builder = null;
 
         try

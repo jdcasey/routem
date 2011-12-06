@@ -197,6 +197,23 @@ public class CouchRouteDataManager
         }
     }
 
+    @Override
+    public MirrorOf getMirror( final String mirrorId )
+        throws RouteMDataException
+    {
+        try
+        {
+            final MirrorOfDoc doc = couch.getDocument( new MirrorOfRef( mirrorId ), MirrorOfDoc.class );
+
+            return doc == null ? null : doc.toMirrorOf();
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException( "Failed to retrieve mirror-of entry for mirror-id: %s. Reason: %s", e,
+                                           mirrorId, e.getMessage() );
+        }
+    }
+
     /*
      * (non-Javadoc)
      * @see org.commonjava.routem.data.RouteDataManager#getMirror(java.lang.String, java.lang.String)
@@ -436,6 +453,21 @@ public class CouchRouteDataManager
         {
             throw new RouteMDataException( "Failed to delete mirror. Canonical URL: %s\nTarget URL: %s\nReason: %s", e,
                                            canonicalUrl, targetUrl, e.getMessage() );
+        }
+    }
+
+    @Override
+    public void deleteMirror( final String mirrorId )
+        throws RouteMDataException
+    {
+        try
+        {
+            couch.delete( new MirrorOfRef( mirrorId ) );
+        }
+        catch ( final CouchDBException e )
+        {
+            throw new RouteMDataException( "Failed to delete mirror. Mirror-ID: %s\nReason: %s", e, mirrorId,
+                                           e.getMessage() );
         }
     }
 

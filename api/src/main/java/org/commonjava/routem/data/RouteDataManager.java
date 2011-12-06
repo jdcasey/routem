@@ -20,6 +20,9 @@ public interface RouteDataManager
     List<MirrorOf> getMirrorsOfGroup( final String groupId )
         throws RouteMDataException;
 
+    MirrorOf getMirror( String mirrorId )
+        throws RouteMDataException;
+
     MirrorOf getMirror( final String canonicalUrl, final String targetUrl )
         throws RouteMDataException;
 
@@ -57,6 +60,9 @@ public interface RouteDataManager
         throws RouteMDataException;
 
     void deleteMirror( String canonicalUrl, String targetUrl )
+        throws RouteMDataException;
+
+    void deleteMirror( String mirrorId )
         throws RouteMDataException;
 
 }
