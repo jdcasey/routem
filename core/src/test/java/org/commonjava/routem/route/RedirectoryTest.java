@@ -1,34 +1,42 @@
-package org.commonjava.routem.rest.live;
+package org.commonjava.routem.route;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.apache.http.HttpResponse;
+import org.apache.log4j.Level;
+import org.commonjava.routem.data.RouteDataManager;
+import org.commonjava.routem.data.mem.MemoryRouteDataManager;
 import org.commonjava.routem.model.Group;
 import org.commonjava.routem.model.MirrorOf;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.commonjava.util.logging.Log4jUtil;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-@RunWith( Arquillian.class )
 public class RedirectoryTest
-    extends AbstractRouteMLiveTest
 {
 
-    @Deployment
-    public static WebArchive createWar()
+    private RouteDataManager dataManager;
+
+    private Redirectory redirectory;
+
+    @BeforeClass
+    public static void setupClass()
     {
-        return createWar( RedirectoryTest.class );
+        Log4jUtil.configure( Level.DEBUG );
+    }
+
+    @Before
+    public void setup()
+    {
+        dataManager = new MemoryRouteDataManager();
+        redirectory = new Redirectory( dataManager );
     }
 
     @Test
     public void pomRequestIsRedirectedToMirror()
         throws Exception
     {
-        disableRedirection();
-
         final Group g = new Group( "org.apache.maven", "http://repo1.maven.apache.org/maven2/" );
 
         assertThat( dataManager.store( g ), equalTo( true ) );
@@ -39,16 +47,15 @@ public class RedirectoryTest
 
         final String path = "org/apache/maven/maven/3.0.3/maven-3.0.3.pom";
 
-        final HttpResponse response = getWithResponse( resourceUrl( "redirectory/" + path ), 307 );
-        assertLocationHeader( response, "http://mirrors.ibiblio.org/pub/mirrors/maven2/" + path );
+        final String url = redirectory.selectRoute( path );
+
+        assertThat( url, equalTo( m.getTargetUrl() + path ) );
     }
 
     @Test
     public void metadataRequestIsRedirectedToMirror()
         throws Exception
     {
-        disableRedirection();
-
         final Group g = new Group( "org.apache.maven", "http://repo1.maven.apache.org/maven2/" );
 
         assertThat( dataManager.store( g ), equalTo( true ) );
@@ -59,8 +66,9 @@ public class RedirectoryTest
 
         final String path = "org/apache/maven/maven/3.0.3/maven-metadata.xml";
 
-        final HttpResponse response = getWithResponse( "http://localhost:8080/test/api/1.0/redirectory/" + path, 307 );
-        assertLocationHeader( response, "http://mirrors.ibiblio.org/pub/mirrors/maven2/" + path );
+        final String url = redirectory.selectRoute( path );
+
+        assertThat( url, equalTo( m.getTargetUrl() + path ) );
     }
 
 }

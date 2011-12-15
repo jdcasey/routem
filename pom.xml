@@ -24,10 +24,13 @@
   <name>Route-M :: Parent</name>
   
   <modules>
-    <module>db</module>
     <module>api</module>
+    <module>core</module>
+    <module>db</module>
     <module>test</module>
     <module>web</module>
+    <module>integration</module>
+    <module>db-bootstrapper</module>
   </modules>
   
   <dependencyManagement>
@@ -45,6 +48,16 @@
         <artifactId>routem-api</artifactId>
         <version>${project.version}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>routem-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>routem-db-bootstrapper</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>

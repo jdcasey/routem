@@ -209,7 +209,7 @@ public abstract class AbstractRouteMLiveTest
         }
     }
 
-    protected <T> Listing<T> getListing( final String url, final TypeToken<Listing<T>> token )
+    protected <T> Listing<T> getListing( final String url, final TypeToken<Listing<T>> typeToken )
         throws Exception
     {
         final HttpGet get = new HttpGet( url );
@@ -226,7 +226,7 @@ public abstract class AbstractRouteMLiveTest
                     assertThat( sl.getStatusCode(), equalTo( HttpStatus.SC_OK ) );
 
                     return serializer.listingFromStream( response.getEntity()
-                                                                 .getContent(), "UTF-8", token );
+                                                                 .getContent(), "UTF-8", typeToken );
                 }
             } );
         }

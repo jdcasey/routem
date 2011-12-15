@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package org.commonjava.routem.rest;
+package org.commonjava.routem.route;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
+import javax.inject.Singleton;
 
 import org.commonjava.routem.data.RouteDataManager;
 import org.commonjava.routem.data.RouteMDataException;
@@ -37,9 +29,8 @@ import org.commonjava.routem.model.MirrorOf;
 import org.commonjava.util.logging.Logger;
 import org.commonjava.util.logging.helper.JoinString;
 
-@Path( "/redirectory" )
-@RequestScoped
-public class Redirectory
+@Singleton
+public final class Redirectory
 {
 
     private final Logger logger = new Logger( getClass() );
@@ -47,56 +38,16 @@ public class Redirectory
     @Inject
     private RouteDataManager dataManager;
 
-    @Path( "/{path: (.+)?}" )
-    @GET
-    public Response getRedirect( @PathParam( "path" ) final String path )
+    Redirectory()
     {
-        ResponseBuilder builder = null;
-        ;
-
-        final String groupId = findGroupId( path );
-        try
-        {
-            logger.debug( "Lookup using data manager: %s", dataManager );
-            final List<MirrorOf> mirrors = dataManager.getMirrorsOfGroup( groupId );
-
-            logger.debug( "Got mirrors:\n\t%s", new JoinString( "\n\t", mirrors ) );
-            if ( mirrors == null || mirrors.isEmpty() )
-            {
-                // TODO: Wildcard support!
-                builder = Response.status( Status.NOT_FOUND );
-            }
-            else
-            {
-                // TODO: Select a mirror properly!
-                final MirrorOf selected = mirrors.get( 0 );
-
-                builder = Response.status( Status.TEMPORARY_REDIRECT )
-                                  .location( new URI( buildUrl( selected.getTargetUrl(), path ) ) );
-            }
-        }
-        catch ( final RouteMDataException e )
-        {
-            logger.error( "Failed to lookup mirror list for groupId: %s (path: %s). Reason: %s", e, groupId, path,
-                          e.getMessage() );
-            builder = Response.serverError();
-        }
-        catch ( final MalformedURLException e )
-        {
-            logger.error( "Failed to construct redirection URL for path: %s. Reason: %s", e, path, e.getMessage() );
-            builder = Response.serverError();
-        }
-        catch ( final URISyntaxException e )
-        {
-            logger.error( "Failed to construct redirection URL for path: %s. Reason: %s", e, path, e.getMessage() );
-            builder = Response.serverError();
-        }
-
-        return builder == null ? Response.serverError()
-                                         .build() : builder.build();
     }
 
-    private String findGroupId( final String path )
+    public Redirectory( final RouteDataManager dataManager )
+    {
+        this.dataManager = dataManager;
+    }
+
+    public String findGroupId( final String path )
     {
         if ( path.endsWith( "/" ) )
         {
@@ -129,7 +80,34 @@ public class Redirectory
         return gid;
     }
 
-    public static String buildUrl( final String baseUrl, final String... parts )
+    public String selectRoute( final String path )
+        throws RouteMDataException
+    {
+        final String groupId = findGroupId( path );
+        logger.debug( "Lookup using data manager: %s", dataManager );
+        final List<MirrorOf> mirrors = dataManager.getMirrorsOfGroup( groupId );
+
+        logger.debug( "Got mirrors:\n\t%s", new JoinString( "\n\t", mirrors ) );
+        if ( mirrors == null || mirrors.isEmpty() )
+        {
+            return null;
+        }
+
+        // TODO: Select a mirror more intelligently!
+        final MirrorOf mirror = mirrors.get( 0 );
+        try
+        {
+            return buildUrl( mirror.getTargetUrl(), path );
+        }
+        catch ( final MalformedURLException e )
+        {
+            throw new RouteMDataException(
+                                           "Cannot construct a valid URL from mirror target: '%s' and path: '%s'. Perhaps the mirror target URL is invalid?",
+                                           e, mirror.getTargetUrl(), path );
+        }
+    }
+
+    private String buildUrl( final String baseUrl, final String... parts )
         throws MalformedURLException
     {
         if ( parts == null || parts.length < 1 )
@@ -181,5 +159,15 @@ public class Redirectory
         // }
 
         return new URL( urlBuilder.toString() ).toExternalForm();
+    }
+
+    protected RouteDataManager getDataManager()
+    {
+        return dataManager;
+    }
+
+    protected void setDataManager( final RouteDataManager dataManager )
+    {
+        this.dataManager = dataManager;
     }
 }

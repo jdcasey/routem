@@ -18,6 +18,7 @@ import org.commonjava.routem.data.RouteMDataException;
 import org.commonjava.routem.data.mem.MemoryRouteDataManager;
 import org.commonjava.routem.model.Group;
 import org.commonjava.routem.model.MirrorOf;
+import org.commonjava.routem.model.RouteMReplicationData;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -71,7 +72,7 @@ public class FlatRouteDataManager
             final Gson gson = new GsonBuilder().setPrettyPrinting()
                                                .create();
 
-            final FlatRouteDTO dto = gson.fromJson( json, FlatRouteDTO.class );
+            final RouteMReplicationData dto = gson.fromJson( json, RouteMReplicationData.class );
 
             if ( dto != null )
             {
@@ -109,7 +110,8 @@ public class FlatRouteDataManager
         final Gson gson = new GsonBuilder().setPrettyPrinting()
                                            .create();
 
-        final FlatRouteDTO dto = new FlatRouteDTO( getAllGroupDefinitions(), getAllMirrorOfDefinitions() );
+        final RouteMReplicationData dto =
+            new RouteMReplicationData( getAllGroupDefinitions(), getAllMirrorOfDefinitions() );
         final String json = gson.toJson( dto );
 
         final File dir = configFile.getParentFile();
