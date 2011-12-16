@@ -39,4 +39,9 @@ public class RouteMReplicationData
         this.mirrors = mirrors;
     }
 
+    public boolean isEmpty()
+    {
+        return groups.isEmpty() && mirrors.isEmpty();
+    }
+
 }

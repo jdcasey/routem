@@ -18,7 +18,9 @@ package org.commonjava.routem.data.couch;
 import java.util.Collections;
 import java.util.List;
 
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.commonjava.auth.couch.conf.UserManagerConfiguration;
@@ -39,6 +41,8 @@ import org.commonjava.routem.model.couch.MirrorOfDoc;
 import org.commonjava.util.logging.Logger;
 
 @Singleton
+@Named( "couch" )
+@Alternative
 public class CouchRouteDataManager
     implements RouteDataManager
 {

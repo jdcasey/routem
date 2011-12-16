@@ -4,11 +4,13 @@ import java.io.File;
 
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
+@Singleton
 public class FlatFileConfigFactory
 {
 
-    private static final String DEFAULT_DATA_FILE = System.getProperty( "user.home", ".m2/routem/data.json" );
+    private static final String DEFAULT_DATA_FILE = "/var/lib/routem/data.json";
 
     private static final String DATA_FILE_SYSPROP = "routem.flat.data";
 

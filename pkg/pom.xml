@@ -22,13 +22,14 @@
     <version>0.1-SNAPSHOT</version>
   </parent>
   
-  <artifactId>routem-integration</artifactId>
+  <artifactId>routem-pkg</artifactId>
   
   <packaging>pom</packaging>
-  <name>Route-M :: Integrations</name>
-  <description>Integrations between Route-M and other tools like Maven.</description>
+  <name>Route-M :: Packaging Parent</name>
+  <description>Different ways Route-M can be packaged, such as bare-bones WAR or Maven Wagon.</description>
   
   <modules>
     <module>embedded-wagon</module>
+    <module>routem-barebones-war</module>
   </modules>
 </project>

@@ -5,10 +5,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -27,21 +23,13 @@ import org.commonjava.web.common.ser.JsonSerializer;
 
 import com.google.gson.reflect.TypeToken;
 
-@Singleton
-@Named( "http" )
 public class HttpBootstrapper
     implements RouteDataBootstrapper
 {
 
-    @Inject
-    private RouteDataManager dataManager;
+    private final RouteDataManager dataManager;
 
-    @Inject
-    private JsonSerializer serializer;
-
-    protected HttpBootstrapper()
-    {
-    }
+    private final JsonSerializer serializer;
 
     public HttpBootstrapper( final RouteDataManager dataManager, final JsonSerializer serializer )
     {
@@ -59,14 +47,20 @@ public class HttpBootstrapper
         final List<? extends MirrorOf> mirrors = getListing( groupsUri, client, MirrorOf.class );
 
         dataManager.install();
-        for ( final Group group : groups )
+        if ( groups != null )
         {
-            dataManager.store( group );
+            for ( final Group group : groups )
+            {
+                dataManager.store( group );
+            }
         }
 
-        for ( final MirrorOf mirror : mirrors )
+        if ( mirrors != null )
         {
-            dataManager.store( mirror );
+            for ( final MirrorOf mirror : mirrors )
+            {
+                dataManager.store( mirror );
+            }
         }
     }
 
@@ -75,6 +69,11 @@ public class HttpBootstrapper
     public final void populateDatabaseFrom( final URI uri )
         throws RouteMDataException
     {
+        if ( uri == null )
+        {
+            return;
+        }
+
         RouteMReplicationData data = null;
         final HttpUriRequest request = createRequest( uri );
         try
@@ -136,6 +135,11 @@ public class HttpBootstrapper
     protected <T> List<? extends T> getListing( final URI uri, final HttpClient client, final Class<T> type )
         throws RouteMDataException
     {
+        if ( uri == null )
+        {
+            return null;
+        }
+
         final TypeToken<Listing<T>> token = new TypeToken<Listing<T>>()
         {
         };
@@ -179,16 +183,6 @@ public class HttpBootstrapper
     protected final JsonSerializer getSerializer()
     {
         return serializer;
-    }
-
-    protected final void setDataManager( final RouteDataManager dataManager )
-    {
-        this.dataManager = dataManager;
-    }
-
-    protected final void setSerializer( final JsonSerializer serializer )
-    {
-        this.serializer = serializer;
     }
 
 }

@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.commonjava.routem.data.RouteDataManager;
 import org.commonjava.routem.data.RouteMDataException;
+import org.commonjava.routem.model.Group;
 import org.commonjava.routem.model.MirrorOf;
 import org.commonjava.util.logging.Logger;
 import org.commonjava.util.logging.helper.JoinString;
@@ -38,63 +39,96 @@ public final class Redirectory
     @Inject
     private RouteDataManager dataManager;
 
+    @Inject
+    private MirrorSelector mirrorSelector;
+
     Redirectory()
     {
     }
 
-    public Redirectory( final RouteDataManager dataManager )
+    public Redirectory( final RouteDataManager dataManager, final MirrorSelector mirrorSelector )
     {
         this.dataManager = dataManager;
+        this.mirrorSelector = mirrorSelector;
     }
 
     public String findGroupId( final String path )
+        throws RouteMDataException
     {
         if ( path.endsWith( "/" ) )
         {
             return null;
         }
 
-        File f = new File( path );
-        for ( int i = 0; i < 3; i++ )
+        File file = new File( path );
+        File version = file.getParentFile();
+
+        if ( file.getName()
+                 .indexOf( '.' ) < 0 )
         {
-            final File d = f.getParentFile();
-            if ( d == null )
+            version = file;
+            file = null;
+        }
+
+        final File artifactId = version == null ? null : version.getParentFile();
+        final File groupId = artifactId == null ? null : artifactId.getParentFile();
+
+        final File[] checks = { groupId, artifactId, version, file };
+
+        for ( final File check : checks )
+        {
+            if ( check == null )
+            {
+                continue;
+            }
+
+            String gid = check.getPath()
+                              .replace( '/', '.' );
+
+            if ( gid.length() < 1 || gid.equals( "." ) )
             {
                 return null;
             }
-            f = d;
+
+            if ( gid.startsWith( "." ) )
+            {
+                gid = gid.substring( 1 );
+            }
+
+            final Group group = dataManager.getGroup( gid );
+            if ( group != null )
+            {
+                return gid;
+            }
         }
 
-        String gid = f.getPath()
-                      .replace( '/', '.' );
-        if ( gid.length() < 1 || gid.equals( "." ) )
+        if ( dataManager.getGroup( Group.WILDCARD ) != null )
         {
-            return null;
+            return Group.WILDCARD;
         }
 
-        if ( gid.startsWith( "." ) )
-        {
-            gid = gid.substring( 1 );
-        }
-
-        return gid;
+        return null;
     }
 
     public String selectRoute( final String path )
         throws RouteMDataException
     {
         final String groupId = findGroupId( path );
-        logger.debug( "Lookup using data manager: %s", dataManager );
-        final List<MirrorOf> mirrors = dataManager.getMirrorsOfGroup( groupId );
-
-        logger.debug( "Got mirrors:\n\t%s", new JoinString( "\n\t", mirrors ) );
-        if ( mirrors == null || mirrors.isEmpty() )
+        if ( groupId == null )
         {
             return null;
         }
 
-        // TODO: Select a mirror more intelligently!
-        final MirrorOf mirror = mirrors.get( 0 );
+        logger.debug( "Lookup using data manager: %s", dataManager );
+        final List<MirrorOf> mirrors = dataManager.getMirrorsOfGroup( groupId );
+
+        logger.debug( "Got mirrors:\n\t%s", new JoinString( "\n\t", mirrors ) );
+        final MirrorOf mirror = selectMirror( mirrors );
+        if ( mirror == null )
+        {
+            return null;
+        }
+
         try
         {
             return buildUrl( mirror.getTargetUrl(), path );
@@ -169,5 +203,10 @@ public final class Redirectory
     protected void setDataManager( final RouteDataManager dataManager )
     {
         this.dataManager = dataManager;
+    }
+
+    public MirrorOf selectMirror( final List<MirrorOf> mirrors )
+    {
+        return mirrorSelector.select( mirrors );
     }
 }

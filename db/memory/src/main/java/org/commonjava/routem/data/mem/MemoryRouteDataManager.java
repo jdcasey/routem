@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.enterprise.inject.Alternative;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -17,6 +18,7 @@ import org.commonjava.util.logging.Logger;
 
 @Singleton
 @Named( "memory" )
+@Alternative
 public class MemoryRouteDataManager
     implements RouteDataManager
 {

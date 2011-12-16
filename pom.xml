@@ -29,8 +29,8 @@
     <module>db</module>
     <module>test</module>
     <module>web</module>
-    <module>integration</module>
     <module>db-bootstrapper</module>
+    <module>pkg</module>
   </modules>
   
   <dependencyManagement>

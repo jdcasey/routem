@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -19,16 +20,20 @@ import org.commonjava.routem.data.mem.MemoryRouteDataManager;
 import org.commonjava.routem.model.Group;
 import org.commonjava.routem.model.MirrorOf;
 import org.commonjava.routem.model.RouteMReplicationData;
+import org.commonjava.util.logging.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 @Singleton
 @Named( "flat" )
+@Alternative
 public class FlatRouteDataManager
     extends MemoryRouteDataManager
     implements RouteDataManager
 {
+
+    private final Logger logger = new Logger( getClass() );
 
     @Inject
     @Named( FlatFileConfigFactory.DATA_FILE_ALIAS )
@@ -36,7 +41,7 @@ public class FlatRouteDataManager
 
     private boolean syncEnabled = true;
 
-    public FlatRouteDataManager()
+    FlatRouteDataManager()
     {
     }
 
@@ -53,7 +58,9 @@ public class FlatRouteDataManager
     {
         if ( configFile == null || !configFile.isFile() )
         {
-            throw new RouteMDataException( "Cannot read route information from: %s", configFile );
+            logger.debug( "Cannot load route data from: '%s'. File was not configured, is missing, or is unreadable.",
+                          configFile );
+            return;
         }
 
         String json = null;
@@ -112,6 +119,12 @@ public class FlatRouteDataManager
 
         final RouteMReplicationData dto =
             new RouteMReplicationData( getAllGroupDefinitions(), getAllMirrorOfDefinitions() );
+
+        if ( dto.isEmpty() && configFile.exists() )
+        {
+            configFile.delete();
+        }
+
         final String json = gson.toJson( dto );
 
         final File dir = configFile.getParentFile();
@@ -210,6 +223,14 @@ public class FlatRouteDataManager
         throws RouteMDataException
     {
         super.deleteMirror( mirrorId );
+        sync();
+    }
+
+    @Override
+    public void install()
+        throws RouteMDataException
+    {
+        super.install();
         sync();
     }
 

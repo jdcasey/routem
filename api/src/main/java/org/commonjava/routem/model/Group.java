@@ -28,6 +28,8 @@ public final class Group
 
     private static final long serialVersionUID = 1L;
 
+    public static final String WILDCARD = "*";
+
     @SerializedName( "group_id" )
     private String groupId;
 

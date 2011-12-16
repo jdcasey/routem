@@ -30,7 +30,7 @@ public class RedirectoryTest
     public void setup()
     {
         dataManager = new MemoryRouteDataManager();
-        redirectory = new Redirectory( dataManager );
+        redirectory = new Redirectory( dataManager, new PickFirstMirrorSelector() );
     }
 
     @Test

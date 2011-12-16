@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.commonjava.routem</groupId>
+    <artifactId>routem-pkg</artifactId>
+    <version>0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>routem-barebones-war</artifactId>
+  <packaging>war</packaging>
+  
+  <name>Route-M :: Bare-Bones WAR Packaging</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>routem-api</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>routem-web-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>routem-db-flat</artifactId>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <finalName>routem</finalName>
+  </build>
+</project>
