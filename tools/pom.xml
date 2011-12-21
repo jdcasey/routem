@@ -22,14 +22,13 @@
     <version>0.1-SNAPSHOT</version>
   </parent>
   
-  <artifactId>routem-web</artifactId>
+  <artifactId>routem-build-tools</artifactId>
   
   <packaging>pom</packaging>
-  <name>Route-M :: Web APIs</name>
+  <name>Route-M :: Build Tools Parent</name>
+  <description>Tools used to build Route-M packages, etc.</description>
   
   <modules>
-    <module>core</module>
-    <module>admin</module>
+    <module>assemblies</module>
   </modules>
-
 </project>

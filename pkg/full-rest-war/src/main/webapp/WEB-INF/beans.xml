@@ -13,23 +13,15 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
---><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <parent>
-    <groupId>org.commonjava.routem</groupId>
-    <artifactId>routem</artifactId>
-    <version>0.1-SNAPSHOT</version>
-  </parent>
-  
-  <artifactId>routem-web</artifactId>
-  
-  <packaging>pom</packaging>
-  <name>Route-M :: Web APIs</name>
-  
-  <modules>
-    <module>core</module>
-    <module>admin</module>
-  </modules>
-
-</project>
+-->
+<beans xmlns="http://java.sun.com/xml/ns/javaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="
+      http://java.sun.com/xml/ns/javaee 
+      http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
+      
+  <alternatives>
+    <class>org.commonjava.routem.data.flat.FlatRouteDataManager</class>
+  </alternatives>
+      
+</beans>

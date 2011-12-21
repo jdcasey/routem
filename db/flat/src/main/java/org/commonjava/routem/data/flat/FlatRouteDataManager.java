@@ -9,14 +9,15 @@ import java.io.IOException;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Alternative;
+import javax.enterprise.inject.Specializes;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.commonjava.routem.conf.flat.FlatFileConfigFactory;
+import org.commonjava.routem.data.DefaultRouteDataManager;
 import org.commonjava.routem.data.RouteDataManager;
 import org.commonjava.routem.data.RouteMDataException;
-import org.commonjava.routem.data.mem.MemoryRouteDataManager;
 import org.commonjava.routem.model.Group;
 import org.commonjava.routem.model.MirrorOf;
 import org.commonjava.routem.model.RouteMReplicationData;
@@ -28,8 +29,9 @@ import com.google.gson.GsonBuilder;
 @Singleton
 @Named( "flat" )
 @Alternative
+@Specializes
 public class FlatRouteDataManager
-    extends MemoryRouteDataManager
+    extends DefaultRouteDataManager
     implements RouteDataManager
 {
 

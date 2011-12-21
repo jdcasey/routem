@@ -18,18 +18,11 @@
   
   <parent>
     <groupId>org.commonjava.routem</groupId>
-    <artifactId>routem</artifactId>
+    <artifactId>routem-build-tools</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
   
-  <artifactId>routem-web</artifactId>
-  
-  <packaging>pom</packaging>
-  <name>Route-M :: Web APIs</name>
-  
-  <modules>
-    <module>core</module>
-    <module>admin</module>
-  </modules>
-
+  <artifactId>routem-assemblies</artifactId>
+  <name>Route-M :: Assembly Descriptors</name>
+  <description>Assemblies used to build Route-M packages</description>
 </project>

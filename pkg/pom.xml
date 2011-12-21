@@ -30,6 +30,41 @@
   
   <modules>
     <module>embedded-wagon</module>
-    <module>routem-barebones-war</module>
+    <module>barebones-war</module>
+    <module>full-rest-war</module>
   </modules>
+  
+  <build>
+    <finalName>${artifactId}</finalName>
+    
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          
+          <dependencies>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>routem-assemblies</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+          </dependencies>
+          
+          <configuration>
+            <appendAssemblyId>false</appendAssemblyId>
+          </configuration>
+          
+          <executions>
+            <execution>
+              <id>default-pkg</id>
+              <goals>
+                <goal>single</goal>
+              </goals>
+              <phase>package</phase>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

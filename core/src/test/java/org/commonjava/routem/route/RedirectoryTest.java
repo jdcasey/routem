@@ -4,8 +4,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import org.apache.log4j.Level;
+import org.commonjava.routem.data.DefaultRouteDataManager;
 import org.commonjava.routem.data.RouteDataManager;
-import org.commonjava.routem.data.mem.MemoryRouteDataManager;
 import org.commonjava.routem.model.Group;
 import org.commonjava.routem.model.MirrorOf;
 import org.commonjava.util.logging.Log4jUtil;
@@ -29,7 +29,7 @@ public class RedirectoryTest
     @Before
     public void setup()
     {
-        dataManager = new MemoryRouteDataManager();
+        dataManager = new DefaultRouteDataManager();
         redirectory = new Redirectory( dataManager, new PickFirstMirrorSelector() );
     }
 
