@@ -21,7 +21,7 @@
       http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
       
   <alternatives>
-    <class>org.commonjava.routem.data.flat.FlatRouteDataManager</class>
+    <class>org.commonjava.routem.data.couch.CouchRouteDataManager</class>
   </alternatives>
       
 </beans>
