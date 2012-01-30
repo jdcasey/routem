@@ -39,7 +39,7 @@ public class RedirectoryResourceTest
 
         final String path = "org/apache/maven/maven/3.0.3/maven-3.0.3.pom";
 
-        final HttpResponse response = getWithResponse( resourceUrl( "redirectory/" + path ), 307 );
+        final HttpResponse response = getWithResponse( resourceUrl( "redirectory", path ), 307 );
         assertLocationHeader( response, "http://mirrors.ibiblio.org/pub/mirrors/maven2/" + path );
     }
 
@@ -59,7 +59,7 @@ public class RedirectoryResourceTest
 
         final String path = "org/apache/maven/maven/3.0.3/maven-metadata.xml";
 
-        final HttpResponse response = getWithResponse( "http://localhost:8080/test/api/1.0/redirectory/" + path, 307 );
+        final HttpResponse response = getWithResponse( resourceUrl( "redirectory", path ), 307 );
         assertLocationHeader( response, "http://mirrors.ibiblio.org/pub/mirrors/maven2/" + path );
     }
 

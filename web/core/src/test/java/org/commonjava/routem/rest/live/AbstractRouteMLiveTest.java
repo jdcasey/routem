@@ -144,7 +144,7 @@ public abstract class AbstractRouteMLiveTest
         return http.post( url, value, type, status );
     }
 
-    protected String resourceUrl( final String path )
+    protected String resourceUrl( final String... path )
         throws MalformedURLException
     {
         return http.resourceUrl( path );
