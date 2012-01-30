@@ -24,7 +24,7 @@
   </parent>
 
   <artifactId>routem-web-core</artifactId>
-  <name>Route-M :: Core</name>
+  <name>Route-M :: Web Core</name>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
