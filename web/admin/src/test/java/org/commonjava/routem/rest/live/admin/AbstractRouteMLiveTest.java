@@ -1,33 +1,17 @@
 package org.commonjava.routem.rest.live.admin;
 
-import static org.commonjava.couch.util.UrlUtils.buildUrl;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 
 import javax.inject.Inject;
 
 import org.apache.http.Header;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.ProtocolException;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Level;
 import org.cjtest.fixture.TestAuthenticationControls;
 import org.commonjava.auth.couch.conf.UserManagerConfiguration;
@@ -40,9 +24,11 @@ import org.commonjava.util.logging.Logger;
 import org.commonjava.web.common.model.Listing;
 import org.commonjava.web.common.ser.JsonSerializer;
 import org.commonjava.web.test.fixture.TestWarArchiveBuilder;
+import org.commonjava.web.test.fixture.WebFixture;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -101,25 +87,17 @@ public abstract class AbstractRouteMLiveTest
     @Inject
     protected CouchRealm realm;
 
-    protected DefaultHttpClient http;
+    @Rule
+    public WebFixture http = new WebFixture();
 
     protected void disableRedirection()
     {
-        http.setRedirectStrategy( new DefaultRedirectStrategy()
-        {
-            @Override
-            public boolean isRedirected( final HttpRequest request, final HttpResponse response,
-                                         final HttpContext context )
-                throws ProtocolException
-            {
-                return false;
-            }
-        } );
+        http.disableRedirection();
     }
 
     protected void enableRedirection()
     {
-        http.setRedirectStrategy( new DefaultRedirectStrategy() );
+        http.enableRedirection();
     }
 
     @Before
@@ -131,11 +109,6 @@ public abstract class AbstractRouteMLiveTest
 
         // setup the security manager.
         realm.setupSecurityManager();
-
-        final ThreadSafeClientConnManager ccm = new ThreadSafeClientConnManager();
-        ccm.setMaxTotal( 20 );
-
-        http = new DefaultHttpClient( ccm );
     }
 
     protected void assertLocationHeader( final HttpResponse response, final String value )
@@ -151,194 +124,55 @@ public abstract class AbstractRouteMLiveTest
     protected <T> T get( final String url, final Class<T> type )
         throws Exception
     {
-        final HttpGet get = new HttpGet( url );
-        try
-        {
-            return http.execute( get, new ResponseHandler<T>()
-            {
-                @SuppressWarnings( "unchecked" )
-                @Override
-                public T handleResponse( final HttpResponse response )
-                    throws ClientProtocolException, IOException
-                {
-                    final StatusLine sl = response.getStatusLine();
-                    assertThat( sl.getStatusCode(), equalTo( HttpStatus.SC_OK ) );
-
-                    return serializer.fromStream( response.getEntity()
-                                                          .getContent(), "UTF-8", type );
-                }
-            } );
-        }
-        finally
-        {
-            get.abort();
-        }
+        return http.get( url, type );
     }
 
     protected void get( final String url, final int expectedStatus )
         throws Exception
     {
-        final HttpGet get = new HttpGet( url );
-        try
-        {
-            http.execute( get, new ResponseHandler<Void>()
-            {
-                @Override
-                public Void handleResponse( final HttpResponse response )
-                    throws ClientProtocolException, IOException
-                {
-                    final StatusLine sl = response.getStatusLine();
-                    assertThat( sl.getStatusCode(), equalTo( expectedStatus ) );
-
-                    return null;
-                }
-            } );
-        }
-        finally
-        {
-            get.abort();
-        }
+        http.get( url, expectedStatus );
     }
 
     protected HttpResponse getWithResponse( final String url, final int expectedStatus )
         throws Exception
     {
-        final HttpGet get = new HttpGet( url );
-        try
-        {
-            final HttpResponse response = http.execute( get );
-            final StatusLine sl = response.getStatusLine();
-            assertThat( sl.getStatusCode(), equalTo( expectedStatus ) );
-
-            return response;
-        }
-        finally
-        {
-            get.abort();
-        }
+        return http.getWithResponse( url, expectedStatus );
     }
 
     protected HttpResponse getWithResponse( final String url, final int expectedStatus, final String accept )
         throws Exception
     {
-        final HttpGet get = new HttpGet( url );
-        get.setHeader( "Accept", accept );
-
-        try
-        {
-            final HttpResponse response = http.execute( get );
-            final StatusLine sl = response.getStatusLine();
-            assertThat( sl.getStatusCode(), equalTo( expectedStatus ) );
-
-            return response;
-        }
-        finally
-        {
-            get.abort();
-        }
+        return http.getWithResponse( url, expectedStatus, accept );
     }
 
     protected <T> Listing<T> getListing( final String url, final TypeToken<Listing<T>> token )
         throws Exception
     {
-        final HttpGet get = new HttpGet( url );
-        try
-        {
-            return http.execute( get, new ResponseHandler<Listing<T>>()
-            {
-                @SuppressWarnings( "unchecked" )
-                @Override
-                public Listing<T> handleResponse( final HttpResponse response )
-                    throws ClientProtocolException, IOException
-                {
-                    final StatusLine sl = response.getStatusLine();
-                    assertThat( sl.getStatusCode(), equalTo( HttpStatus.SC_OK ) );
-
-                    return serializer.listingFromStream( response.getEntity()
-                                                                 .getContent(), "UTF-8", token );
-                }
-            } );
-        }
-        finally
-        {
-            get.abort();
-        }
+        return http.getListing( url, token );
     }
 
     protected HttpResponse delete( final String url )
         throws Exception
     {
-        final HttpDelete request = new HttpDelete( url );
-        try
-        {
-            final HttpResponse response = http.execute( request );
-
-            assertThat( response.getStatusLine()
-                                .getStatusCode(), equalTo( HttpStatus.SC_OK ) );
-
-            return response;
-        }
-        finally
-        {
-            request.abort();
-        }
+        return http.delete( url );
     }
 
     protected HttpResponse post( final String url, final Object value, final int status )
         throws Exception
     {
-        final HttpPost request = new HttpPost( url );
-        request.setEntity( new StringEntity( serializer.toString( value ), "application/json", "UTF-8" ) );
-
-        try
-        {
-            final HttpResponse response = http.execute( request );
-
-            assertThat( response.getStatusLine()
-                                .getStatusCode(), equalTo( status ) );
-
-            return response;
-        }
-        finally
-        {
-            request.abort();
-        }
+        return http.post( url, value, status );
     }
 
     protected HttpResponse post( final String url, final Object value, final Type type, final int status )
         throws Exception
     {
-        final HttpPost request = new HttpPost( url );
-        request.setEntity( new StringEntity( serializer.toString( value, type ), "application/json", "UTF-8" ) );
-
-        try
-        {
-            final HttpResponse response = http.execute( request );
-
-            assertThat( response.getStatusLine()
-                                .getStatusCode(), equalTo( status ) );
-
-            return response;
-        }
-        finally
-        {
-            request.abort();
-        }
+        return http.post( url, value, type, status );
     }
 
     protected String resourceUrl( final String... path )
         throws MalformedURLException
     {
-        final String[] parts = new String[path.length + 1];
-        parts[0] = apiVersion();
-        System.arraycopy( path, 0, parts, 1, path.length );
-
-        return buildUrl( "http://localhost:8080/test/api/", parts );
-    }
-
-    protected String apiVersion()
-    {
-        return "1.0";
+        return http.resourceUrl( path );
     }
 
 }

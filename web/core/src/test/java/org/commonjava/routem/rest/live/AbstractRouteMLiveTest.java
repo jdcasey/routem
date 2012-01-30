@@ -12,7 +12,6 @@ import javax.inject.Inject;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.log4j.Level;
 import org.commonjava.couch.test.fixture.LoggingFixture;
 import org.commonjava.routem.data.RouteDataManager;
@@ -61,9 +60,6 @@ public abstract class AbstractRouteMLiveTest
     {
         logger.info( "Installing DB using dataManager: %s", dataManager );
         dataManager.install();
-
-        final ThreadSafeClientConnManager ccm = new ThreadSafeClientConnManager();
-        ccm.setMaxTotal( 20 );
     }
 
     protected static final String HOST = "localhost";
@@ -148,11 +144,6 @@ public abstract class AbstractRouteMLiveTest
         throws MalformedURLException
     {
         return http.resourceUrl( path );
-    }
-
-    protected String apiVersion()
-    {
-        return "1.0";
     }
 
 }
