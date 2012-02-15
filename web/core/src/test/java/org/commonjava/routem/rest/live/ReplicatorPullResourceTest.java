@@ -9,7 +9,7 @@ import org.commonjava.routem.model.Group;
 import org.commonjava.routem.model.MirrorOf;
 import org.commonjava.routem.model.RouteMReplicationData;
 import org.commonjava.util.logging.Log4jUtil;
-import org.commonjava.web.common.model.Listing;
+import org.commonjava.web.json.model.Listing;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;

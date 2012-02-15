@@ -70,8 +70,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.commonjava.couch.test</groupId>
-      <artifactId>couch-as7-test-harness</artifactId>
+      <groupId>org.commonjava.qarqas</groupId>
+      <artifactId>qarqas-test-harness</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -80,8 +80,8 @@
       <artifactId>logging</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.commonjava.couch.web</groupId>
-      <artifactId>web-common</artifactId>
+      <groupId>org.commonjava.web</groupId>
+      <artifactId>json-serialization</artifactId>
     </dependency>
     <dependency>
       <groupId>org.commonjava.couch</groupId>

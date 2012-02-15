@@ -27,8 +27,8 @@ import org.commonjava.routem.data.RouteDataManager;
 import org.commonjava.routem.data.RouteMDataException;
 import org.commonjava.routem.model.Group;
 import org.commonjava.util.logging.Logger;
-import org.commonjava.web.common.model.Listing;
-import org.commonjava.web.common.ser.JsonSerializer;
+import org.commonjava.web.json.model.Listing;
+import org.commonjava.web.json.ser.JsonSerializer;
 
 import com.google.gson.reflect.TypeToken;
 

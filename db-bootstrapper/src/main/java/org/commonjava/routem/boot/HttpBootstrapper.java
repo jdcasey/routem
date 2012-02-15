@@ -18,8 +18,8 @@ import org.commonjava.routem.data.RouteMDataException;
 import org.commonjava.routem.model.Group;
 import org.commonjava.routem.model.MirrorOf;
 import org.commonjava.routem.model.RouteMReplicationData;
-import org.commonjava.web.common.model.Listing;
-import org.commonjava.web.common.ser.JsonSerializer;
+import org.commonjava.web.json.model.Listing;
+import org.commonjava.web.json.ser.JsonSerializer;
 
 import com.google.gson.reflect.TypeToken;
 

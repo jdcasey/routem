@@ -9,7 +9,7 @@ import org.commonjava.routem.data.RouteMDataException;
 import org.commonjava.routem.data.flat.FlatRouteDataManager;
 import org.commonjava.routem.route.PickFirstMirrorSelector;
 import org.commonjava.routem.route.Redirectory;
-import org.commonjava.web.common.ser.JsonSerializer;
+import org.commonjava.web.json.ser.JsonSerializer;
 
 public class RouteMGateway
 {

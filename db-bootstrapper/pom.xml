@@ -33,8 +33,8 @@
       <artifactId>httpclient</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.commonjava.couch.web</groupId>
-      <artifactId>web-common</artifactId>
+      <groupId>org.commonjava.web</groupId>
+      <artifactId>json-serialization</artifactId>
     </dependency>
   </dependencies>
 </project>
